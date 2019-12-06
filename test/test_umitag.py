@@ -28,27 +28,33 @@ CORRECT_UMITAGGED_OUTPUT_FOLDER = 'data/umitagged'
 class TestUMITag(unittest.TestCase):
 
     def setUp(self):
-        # Create the output folder
-        os.makedirs(TEST_OUTPUT_PATH)
+        """ Create the output folder """
+        if not os.path.exists(TEST_OUTPUT_PATH):
+           os.makedirs(TEST_OUTPUT_PATH)
+        with open(os.path.join(TEST_OUTPUT_PATH, 'diffsample.r1.umitagged.fastq'), 'w') as fh:
+           fh.write(' ')
 
+    def testSortVersion(self):
+        """ try to run sort --version """
+        assert(umitag.get_sort_opts() in ['', ' -V '])
 
     def testUMITagTestCase(self):
-        # Run the umitag module on the test data
+        """ Run the umitag module on the test data """
+        print(os.getcwd())
         umitag.umitag(TEST_DATA_FILES['read1'],
                                 TEST_DATA_FILES['read2'],
                                 TEST_DATA_FILES['index1'],
                                 TEST_DATA_FILES['index2'],
                                 TEST_DATA_FILES['read1_out'],
                                 TEST_DATA_FILES['read2_out'],
-                                TEST_OUTPUT_PATH)
+                                TEST_OUTPUT_PATH, '8B12H,,,', 8)
 
         self.assertTrue(utils.checkFolderEquality(TEST_OUTPUT_PATH, CORRECT_UMITAGGED_OUTPUT_FOLDER))
 
-
     def tearDown(self):
-        # Delete the output folder and the results
+        """ Delete the output folder and the results """
         shutil.rmtree(TEST_OUTPUT_PATH)
-        pass
+
 
 if __name__ == '__main__':
     unittest.main()
